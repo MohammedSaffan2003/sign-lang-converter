@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Sign Language Converter</h1>
+    </header>
+    <main>
+        <section class="camera-section">
+            <div id="camera-container">
+                <video id="video" autoplay playsinline></video>
+            </div>
+            <div class="button-container">
+                <button id="start" class="btn">Start Camera</button>
+                <button id="capture" class="btn">Capture</button>
+                <button id="stop" class="btn">Stop Camera</button>
+            </div>
+            <div id="result-container">
+                <h2>Recognition Result</h2>
+                <div id="result-text"></div>
+                <button id="speak" class="btn">Speak</button>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Sign Language Converter. All rights reserved.</p>
+    </footer>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
