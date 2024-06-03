@@ -33,14 +33,15 @@ captureButton.addEventListener('click', () => {
 
     fetch('/predict', {
         method: 'POST',
-        body: dataURItoBlob(dataURL),
         headers: {
+            'Content-Type': 'application/json',
             'Accept': 'application/json',
-        }
+        },
+        body: JSON.stringify({ image: dataURL })
     })
     .then(response => response.json())
     .then(data => {
-        resultText.textContent = data.prediction;
+        resultText.textContent = data.result;
     })
     .catch(error => {
         console.error('Error:', error);
@@ -59,14 +60,3 @@ speakButton.addEventListener('click', () => {
     const speech = new SpeechSynthesisUtterance(resultText.textContent);
     speechSynthesis.speak(speech);
 });
-
-function dataURItoBlob(dataURI) {
-    const byteString = atob(dataURI.split(',')[1]);
-    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-    }
-    return new Blob([ab], { type: mimeString });
-}
