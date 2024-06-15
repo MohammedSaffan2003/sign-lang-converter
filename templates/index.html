@@ -20,11 +20,20 @@
                 <button id="capture" class="btn">Capture</button>
                 <button id="stop" class="btn">Stop Camera</button>
             </div>
+            <div id="result-container">
+                <h2>Recognition Result</h2>
+                <div id="result-text"></div>
+                <button id="speak" class="btn">Speak</button>
+            </div>
         </section>
-        <section id="result-container">
-            <h2>Recognition Result</h2>
-            <div id="result-text"></div>
-            <button id="speak" class="btn">Speak</button>
+
+        <section class="upload-section">
+            <h2>Upload an Image</h2>
+            <input type="file" id="imageUpload" accept="image/*" class="btn">
+            <div id="uploaded-image-container">
+                <img id="uploaded-image" src="#" alt="Uploaded Image" style="display: none;">
+            </div>
+            <button id="upload" class="btn">Upload Image</button>
         </section>
     </main>
     <footer>

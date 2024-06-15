@@ -21,36 +21,35 @@ h1 {
 
 main {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: flex-start;
     height: calc(100vh - 170px);
     padding: 1rem;
-    flex-wrap: wrap;
-    gap: 20px;
+    flex-wrap: wrap; /* Ensure wrapping on smaller screens */
 }
 
 footer {
-    background: #333;
+    background: #333; 
     color: #fff;
     text-align: center;
-    padding: 0.5rem;
+    /* padding: 0.5rem; */
     position: fixed;
     width: 100%;
-    bottom: 0;
+    /* bottom: 0; */
 }
 
 /* Camera Section */
-.camera-section {
+.camera-section, .upload-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 45%;
-    box-sizing: border-box;
+    width: 45%; /* Adjust width to fit both sections side by side */
+    margin-bottom: 20px;
 }
 
-#camera-container {
+#camera-container, #uploaded-image-container {
     position: relative;
-    width: 100%;
+    width: 400px;
     height: 300px;
     border: 2px solid #4CAF50;
     border-radius: 10px;
@@ -60,15 +59,16 @@ footer {
     margin-bottom: 10px;
 }
 
-#video {
+#video, #uploaded-image {
     width: 100%;
     height: 100%;
-    display: none; /* Hide the video element initially */
+    display: none; /* Hide the video and image elements initially */
 }
 
-.button-container {
+.button-container, .upload-section {
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
     margin-bottom: 20px;
 }
@@ -81,48 +81,24 @@ footer {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-top: 10px;
 }
 
 .btn:hover {
     background-color: #45a049;
 }
 
-/* Result Section */
 #result-container {
-    width: 45%;
+    width: 100%;
     text-align: center;
     background-color: #fff;
     padding: 1rem;
     border: 2px solid #4CAF50;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
 }
 
 #result-text {
     font-size: 1.5rem;
     margin: 1rem 0;
-}
-
-/* Media Query for Mobile Devices */
-@media (max-width: 768px) {
-    main {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .camera-section, #result-container {
-        width: 80%;
-    }
-
-    .button-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .btn {
-        margin-bottom: 10px;
-        width: 80%;
-        max-width: 300px;
-    }
 }

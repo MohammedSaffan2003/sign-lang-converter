@@ -19,3 +19,12 @@ def create_model(input_shape=(64, 64, 3), num_classes=36):
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     
     return model
+
+    """
+     Creates and compiles a neural network. This model is used to predict the class probabilities and a softmax layer for each class
+     
+     @param input_shape - Shape of the input feature map
+     @param num_classes - Number of classes in the model ( default 36 )
+     
+     @return Model compiled and ready to be used for training ( Sequential
+    """
