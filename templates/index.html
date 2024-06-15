@@ -11,7 +11,11 @@
         <h1>Sign Language Converter</h1>
     </header>
     <main>
-        <section class="camera-section">
+        <div class="choice-container">
+            <button id="choose-capture" class="btn">Predict Through Captured Image</button>
+            <button id="choose-upload" class="btn">Predict Through Uploaded Image</button>
+        </div>
+        <section id="capture-section" class="hidden">
             <div id="camera-container">
                 <video id="video" autoplay playsinline></video>
             </div>
@@ -26,14 +30,14 @@
                 <button id="speak" class="btn">Speak</button>
             </div>
         </section>
-
-        <section class="upload-section">
-            <h2>Upload an Image</h2>
-            <input type="file" id="imageUpload" accept="image/*" class="btn">
-            <div id="uploaded-image-container">
-                <img id="uploaded-image" src="#" alt="Uploaded Image" style="display: none;">
+        <section id="upload-section" class="hidden">
+            <input type="file" id="imageUpload" accept="image/*" />
+            <button id="upload" class="btn">Upload</button>
+            <div id="upload-result-container">
+                <h2>Recognition Result</h2>
+                <div id="upload-result-text"></div>
+                <button id="upload-speak" class="btn">Speak</button>
             </div>
-            <button id="upload" class="btn">Upload Image</button>
         </section>
     </main>
     <footer>

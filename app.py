@@ -50,5 +50,25 @@ def predict():
     response = {'prediction': sign_language_letter}
     return jsonify(response)
 
+@app.route('/predict_upload', methods=['POST'])
+def predict_upload():
+    data = request.get_json()
+    image_data = data['image']
+
+    img_bytes = base64.b64decode(image_data)
+    img_np = np.frombuffer(img_bytes, dtype=np.uint8)
+    img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.resize(img, (64, 64))
+    img = img.reshape(1, 64, 64, 1)
+    img = img / 255.0
+
+    prediction = model.predict(img)
+    predicted_class = np.argmax(prediction)
+    sign_language_letter = label_mapping[predicted_class]
+
+    response = {'prediction': sign_language_letter}
+    return jsonify(response)
+
 if __name__ == '__main__':
     app.run(debug=True)

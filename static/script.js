@@ -80,3 +80,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // JS to handle the options
+document.getElementById('choose-capture').addEventListener('click', function() {
+    document.getElementById('capture-section').classList.remove('hidden');
+    document.getElementById('upload-section').classList.add('hidden');
+});
+
+document.getElementById('choose-upload').addEventListener('click', function() {
+    document.getElementById('upload-section').classList.remove('hidden');
+    document.getElementById('capture-section').classList.add('hidden');
+});
+
+document.getElementById('upload').addEventListener('click', function() {
+    const fileInput = document.getElementById('imageUpload');
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = function() {
+        const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+
+        fetch('/predict_upload', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ image: base64String })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('upload-result-text').innerText = data.prediction;
+        })
+        .catch(error => console.error('Error:', error));
+    };
+
+    if (file) {
+        reader.readAsDataURL(file);
+    }
+});
