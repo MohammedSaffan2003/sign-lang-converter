@@ -7,10 +7,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const speakButton = document.getElementById('speak');
     const imageUpload = document.getElementById('imageUpload');
     const uploadButton = document.getElementById('upload');
-    const uploadedImageContainer = document.getElementById('uploaded-image-container');
     const uploadedImage = document.getElementById('uploaded-image');
+    const uploadResultText = document.getElementById('upload-result-text');
+    const uploadSpeakButton = document.getElementById('upload-speak');
+
+    const captureSection = document.getElementById('capture-section');
+    const uploadSection = document.getElementById('upload-section');
+    const chooseCaptureButton = document.getElementById('choose-capture');
+    const chooseUploadButton = document.getElementById('choose-upload');
 
     let stream;
+
+    // Toggle sections
+    chooseCaptureButton.addEventListener('click', () => {
+        captureSection.classList.remove('hidden');
+        uploadSection.classList.add('hidden');
+    });
+
+    chooseUploadButton.addEventListener('click', () => {
+        uploadSection.classList.remove('hidden');
+        captureSection.classList.add('hidden');
+    });
 
     // Camera functions
     startButton.addEventListener('click', async () => {
@@ -50,6 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.speechSynthesis.speak(msg);
     });
 
+    uploadSpeakButton.addEventListener('click', () => {
+        const msg = new SpeechSynthesisUtterance(uploadResultText.innerText);
+        window.speechSynthesis.speak(msg);
+    });
+
     // Image upload functions
     uploadButton.addEventListener('click', () => {
         const file = imageUpload.files[0];
@@ -68,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(response => response.json())
             .then(data => {
-                resultText.innerText = data.prediction;
+                uploadResultText.innerText = data.prediction;
             });
         };
 
@@ -76,43 +98,4 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(file);
         }
     });
-});
-
-
-// JS to handle the options
-document.getElementById('choose-capture').addEventListener('click', function() {
-    document.getElementById('capture-section').classList.remove('hidden');
-    document.getElementById('upload-section').classList.add('hidden');
-});
-
-document.getElementById('choose-upload').addEventListener('click', function() {
-    document.getElementById('upload-section').classList.remove('hidden');
-    document.getElementById('capture-section').classList.add('hidden');
-});
-
-document.getElementById('upload').addEventListener('click', function() {
-    const fileInput = document.getElementById('imageUpload');
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-
-    reader.onloadend = function() {
-        const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
-
-        fetch('/predict_upload', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ image: base64String })
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('upload-result-text').innerText = data.prediction;
-        })
-        .catch(error => console.error('Error:', error));
-    };
-
-    if (file) {
-        reader.readAsDataURL(file);
-    }
 });
