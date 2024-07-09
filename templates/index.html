@@ -14,6 +14,7 @@
         <div class="choice-container">
             <button id="choose-capture" class="btn">Predict Through Captured Image</button>
             <button id="choose-upload" class="btn">Predict Through Uploaded Image</button>
+            <button id="choose-sign-words" class="btn">See Sign Of Words</button>
         </div>
         <section id="capture-section" class="hidden">
             <div id="camera-container">
@@ -41,6 +42,21 @@
                 <div id="upload-result-text"></div>
                 <button id="upload-speak" class="btn">Speak</button>
             </div>
+        </section>
+        <section id="sign-words-section" class="hidden">
+            <input type="text" id="word-input" placeholder="Type a word or phrase and press Enter">
+            <div id="sign-output-container">
+                <h2>Sign Language Output</h2>
+                <div id="sign-output"></div>
+            </div>
+        </section>
+
+        <section id="word-section" class="hidden">
+            <form id="text-form">
+                <input type="text" id="text-input" placeholder="Type a word or sentence">
+                <button type="submit" class="btn">Convert to Sign</button>
+            </form>
+            <div id="word-output-container"></div>
         </section>
     </main>
     <footer>

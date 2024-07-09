@@ -13,8 +13,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const captureSection = document.getElementById('capture-section');
     const uploadSection = document.getElementById('upload-section');
+    const signWordsSection = document.getElementById('sign-words-section');
     const chooseCaptureButton = document.getElementById('choose-capture');
     const chooseUploadButton = document.getElementById('choose-upload');
+    const chooseSignWordsButton = document.getElementById('choose-sign-words');
+    const wordInput = document.getElementById('word-input');
+    const signOutput = document.getElementById('sign-output');
+
+    
+
+    
 
     let stream;
 
@@ -22,11 +30,19 @@ document.addEventListener('DOMContentLoaded', () => {
     chooseCaptureButton.addEventListener('click', () => {
         captureSection.classList.remove('hidden');
         uploadSection.classList.add('hidden');
+        signWordsSection.classList.add('hidden');
     });
 
     chooseUploadButton.addEventListener('click', () => {
         uploadSection.classList.remove('hidden');
         captureSection.classList.add('hidden');
+        signWordsSection.classList.add('hidden');
+    });
+
+    chooseSignWordsButton.addEventListener('click', () => {
+        signWordsSection.classList.remove('hidden');
+        captureSection.classList.add('hidden');
+        uploadSection.classList.add('hidden');
     });
 
     // Camera functions
@@ -96,6 +112,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (file) {
             reader.readAsDataURL(file);
+        }
+    });
+
+    // Handle word input for sign language display
+
+    
+    const inputField = document.getElementById('text-input');
+    const textForm = document.getElementById('text-form');
+    const wordOutputContainer = document.getElementById('word-output-container');
+
+    textForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        wordOutputContainer.innerHTML = '';
+
+        const text = inputField.value;
+        const words = text.split(' ');
+
+        const colors = ['#FFD700', '#ADFF2F', '#FF69B4', '#87CEEB', '#FF4500'];
+        let colorIndex = 0;
+
+        words.forEach(word => {
+            const wordDiv = document.createElement('div');
+            wordDiv.classList.add('word-frame');
+            wordDiv.style.border = `1px solid ${colors[colorIndex % colors.length]}`;
+            wordDiv.style.backgroundColor = colors[colorIndex % colors.length];
+            colorIndex++;
+
+            for (let char of word) {
+                if (/[a-zA-Z0-9]/.test(char)) {
+                    const img = document.createElement('img');
+                    img.src = `static/letters/${char.toLowerCase()}.png`;
+                    img.alt = char;
+                    wordDiv.appendChild(img);
+                } else {
+                    const span = document.createElement('span');
+                    span.textContent = char;
+                    span.classList.add('non-alphanumeric');
+                    wordDiv.appendChild(span);
+                }
+            }
+
+            wordOutputContainer.appendChild(wordDiv);
+        });
+
+        inputField.value = '';
+    });
+
+
+    wordInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            const word = wordInput.value.trim().toLowerCase();
+            signOutput.innerHTML = '';
+            for (let char of word) {
+                if (char.match(/[a-z0-9]/)) {
+                    const img = document.createElement('img');
+                    img.src = `static/letters/${char}.png`;
+                    img.alt = char;
+                    img.className = 'sign-letter';
+                    signOutput.appendChild(img);
+                } else if (char === ' ') {
+                    const space = document.createElement('div');
+                    space.className = 'sign-space';
+                    signOutput.appendChild(space);
+                }
+            }
         }
     });
 });
