@@ -30,7 +30,7 @@ def index():
 def predict():
     data = request.get_json()
     image_data = data['image']
-
+    
     if 'data:image' in image_data:
         # Base64 string with header, remove the header part
         image_data = re.sub('^data:image/.+;base64,', '', image_data)
