@@ -4,6 +4,7 @@ import numpy as np
 import tensorflow as tf
 import base64
 import re
+import mediapipe as mp
 
 app = Flask(__name__)
 
@@ -22,6 +23,9 @@ label_mapping = {
     35: 'z'
 }
 
+mp_hands = mp.solutions.hands
+mp_drawing = mp.solutions.drawing_utils
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -32,20 +36,38 @@ def predict():
     image_data = data['image']
     
     if 'data:image' in image_data:
-        # Base64 string with header, remove the header part
         image_data = re.sub('^data:image/.+;base64,', '', image_data)
 
     img_bytes = base64.b64decode(image_data)
     img_np = np.frombuffer(img_bytes, dtype=np.uint8)
     img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img = cv2.resize(img, (64, 64))
-    img = img.reshape(1, 64, 64, 1)
-    img = img / 255.0
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-    prediction = model.predict(img)
-    predicted_class = np.argmax(prediction)
-    sign_language_letter = label_mapping[predicted_class]
+    with mp_hands.Hands(static_image_mode=True, max_num_hands=1, min_detection_confidence=0.5) as hands:
+        results = hands.process(img)
+
+        if results.multi_hand_landmarks:
+            for hand_landmarks in results.multi_hand_landmarks:
+                mp_drawing.draw_landmarks(img, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+
+            h, w, _ = img.shape
+            x_min, x_max, y_min, y_max = w, 0, h, 0
+            for landmark in hand_landmarks.landmark:
+                x, y = int(landmark.x * w), int(landmark.y * h)
+                x_min, x_max = min(x_min, x), max(x_max, x)
+                y_min, y_max = min(y_min, y), max(y_max, y)
+
+            hand_img = img[y_min:y_max, x_min:x_max]
+            hand_img = cv2.cvtColor(hand_img, cv2.COLOR_RGB2GRAY)
+            hand_img = cv2.resize(hand_img, (64, 64))
+            hand_img = hand_img.reshape(1, 64, 64, 1)
+            hand_img = hand_img / 255.0
+
+            prediction = model.predict(hand_img)
+            predicted_class = np.argmax(prediction)
+            sign_language_letter = label_mapping[predicted_class]
+        else:
+            sign_language_letter = "No hand detected"
 
     response = {'prediction': sign_language_letter}
     return jsonify(response)

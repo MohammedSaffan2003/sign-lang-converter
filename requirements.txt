@@ -79,3 +79,4 @@ wrapt==1.16.0
 zstandard @ file:///work/perseverance-python-buildout/croot/zstandard_1698847073368/work
 
 
+mediapipe

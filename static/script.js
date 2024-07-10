@@ -1,64 +1,90 @@
 document.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById('video');
-    const startButton = document.getElementById('start');
-    const captureButton = document.getElementById('capture');
-    const stopButton = document.getElementById('stop');
     const resultText = document.getElementById('result-text');
-    const speakButton = document.getElementById('speak');
-    const imageUpload = document.getElementById('imageUpload');
-    const uploadButton = document.getElementById('upload');
-    const uploadedImage = document.getElementById('uploaded-image');
     const uploadResultText = document.getElementById('upload-result-text');
-    const uploadSpeakButton = document.getElementById('upload-speak');
-
-    const captureSection = document.getElementById('capture-section');
-    const uploadSection = document.getElementById('upload-section');
-    const signWordsSection = document.getElementById('sign-words-section');
-    const chooseCaptureButton = document.getElementById('choose-capture');
-    const chooseUploadButton = document.getElementById('choose-upload');
-    const chooseSignWordsButton = document.getElementById('choose-sign-words');
-    const wordInput = document.getElementById('word-input');
-    const signOutput = document.getElementById('sign-output');
-
-    
-
-    
-
     let stream;
 
-    // Toggle sections
-    chooseCaptureButton.addEventListener('click', () => {
-        captureSection.classList.remove('hidden');
-        uploadSection.classList.add('hidden');
-        signWordsSection.classList.add('hidden');
-    });
+    const init = () => {
+        setupEventListeners();
+    };
 
-    chooseUploadButton.addEventListener('click', () => {
-        uploadSection.classList.remove('hidden');
-        captureSection.classList.add('hidden');
-        signWordsSection.classList.add('hidden');
-    });
+    const setupEventListeners = () => {
+        document.getElementById('choose-capture').addEventListener('click', showCaptureSection);
+        document.getElementById('choose-upload').addEventListener('click', showUploadSection);
+        document.getElementById('choose-sign-words').addEventListener('click', showSignWordsSection);
 
-    chooseSignWordsButton.addEventListener('click', () => {
-        signWordsSection.classList.remove('hidden');
-        captureSection.classList.add('hidden');
-        uploadSection.classList.add('hidden');
-    });
+        document.getElementById('start').addEventListener('click', startCamera);
+        document.getElementById('capture').addEventListener('click', captureImage);
+        document.getElementById('stop').addEventListener('click', stopCamera);
+        document.getElementById('speak').addEventListener('click', () => speakText(resultText.innerText));
+        document.getElementById('upload-speak').addEventListener('click', () => speakText(uploadResultText.innerText));
+        document.getElementById('upload').addEventListener('click', uploadImage);
+        document.getElementById('word-input').addEventListener('keydown', handleWordInput);
+    };
 
-    // Camera functions
-    startButton.addEventListener('click', async () => {
+    const showCaptureSection = () => {
+        toggleVisibility('capture-section');
+    };
+
+    const showUploadSection = () => {
+        toggleVisibility('upload-section');
+    };
+
+    const showSignWordsSection = () => {
+        toggleVisibility('sign-words-section');
+    };
+
+    const toggleVisibility = (sectionId) => {
+        const sections = ['capture-section', 'upload-section', 'sign-words-section'];
+        sections.forEach(id => {
+            document.getElementById(id).classList.toggle('hidden', id !== sectionId);
+        });
+    };
+
+    const startCamera = async () => {
         stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
         video.style.display = 'block';
-    });
+    };
 
-    captureButton.addEventListener('click', () => {
+    const captureImage = () => {
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageDataUrl = canvas.toDataURL('image/png');
 
+        fetchPrediction(imageDataUrl, resultText);
+    };
+
+    const stopCamera = () => {
+        stream.getTracks().forEach(track => track.stop());
+        video.style.display = 'none';
+    };
+
+    const speakText = (text) => {
+        const msg = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(msg);
+    };
+
+    const uploadImage = () => {
+        const file = document.getElementById('imageUpload').files[0];
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const imageUrl = reader.result;
+            document.getElementById('uploaded-image').src = imageUrl;
+            document.getElementById('uploaded-image').style.display = 'block';
+
+            fetchPrediction(imageUrl, uploadResultText);
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const fetchPrediction = (imageDataUrl, resultElement) => {
         fetch('/predict', {
             method: 'POST',
             body: JSON.stringify({ image: imageDataUrl }),
@@ -68,102 +94,17 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(data => {
-            resultText.innerText = data.prediction;
+            resultElement.innerText = data.prediction;
         });
-    });
+    };
 
-    stopButton.addEventListener('click', () => {
-        stream.getTracks().forEach(track => track.stop());
-        video.style.display = 'none';
-    });
-
-    // Speak function
-    speakButton.addEventListener('click', () => {
-        const msg = new SpeechSynthesisUtterance(resultText.innerText);
-        window.speechSynthesis.speak(msg);
-    });
-
-    uploadSpeakButton.addEventListener('click', () => {
-        const msg = new SpeechSynthesisUtterance(uploadResultText.innerText);
-        window.speechSynthesis.speak(msg);
-    });
-
-    // Image upload functions
-    uploadButton.addEventListener('click', () => {
-        const file = imageUpload.files[0];
-        const reader = new FileReader();
-
-        reader.onload = () => {
-            uploadedImage.src = reader.result;
-            uploadedImage.style.display = 'block';
-
-            fetch('/predict', {
-                method: 'POST',
-                body: JSON.stringify({ image: reader.result }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                uploadResultText.innerText = data.prediction;
-            });
-        };
-
-        if (file) {
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Handle word input for sign language display
-
-    
-    const inputField = document.getElementById('text-input');
-    const textForm = document.getElementById('text-form');
-    const wordOutputContainer = document.getElementById('word-output-container');
-
-    textForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        wordOutputContainer.innerHTML = '';
-
-        const text = inputField.value;
-        const words = text.split(' ');
-
-        const colors = ['#FFD700', '#ADFF2F', '#FF69B4', '#87CEEB', '#FF4500'];
-        let colorIndex = 0;
-
-        words.forEach(word => {
-            const wordDiv = document.createElement('div');
-            wordDiv.classList.add('word-frame');
-            wordDiv.style.border = `1px solid ${colors[colorIndex % colors.length]}`;
-            wordDiv.style.backgroundColor = colors[colorIndex % colors.length];
-            colorIndex++;
-
-            for (let char of word) {
-                if (/[a-zA-Z0-9]/.test(char)) {
-                    const img = document.createElement('img');
-                    img.src = `static/letters/${char.toLowerCase()}.png`;
-                    img.alt = char;
-                    wordDiv.appendChild(img);
-                } else {
-                    const span = document.createElement('span');
-                    span.textContent = char;
-                    span.classList.add('non-alphanumeric');
-                    wordDiv.appendChild(span);
-                }
-            }
-
-            wordOutputContainer.appendChild(wordDiv);
-        });
-
-        inputField.value = '';
-    });
-
-
-    wordInput.addEventListener('keydown', (event) => {
+    const handleWordInput = (event) => {
         if (event.key === 'Enter') {
+            const wordInput = event.target;
             const word = wordInput.value.trim().toLowerCase();
+            const signOutput = document.getElementById('sign-output');
             signOutput.innerHTML = '';
+
             for (let char of word) {
                 if (char.match(/[a-z0-9]/)) {
                     const img = document.createElement('img');
@@ -178,5 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-    });
+    };
+
+    init();
 });

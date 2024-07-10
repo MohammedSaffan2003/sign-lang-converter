@@ -1,3 +1,9 @@
 # isl_data_grey_split
 src/__pycache__
 venv
+
+# not required for project
+extract.py
+
+#refectoring
+app.py
