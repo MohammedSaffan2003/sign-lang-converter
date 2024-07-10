@@ -4,6 +4,7 @@ import numpy as np
 import tensorflow as tf
 import base64
 import re
+import mediapipe as mp
 
 app = Flask(__name__)
 
@@ -69,6 +70,42 @@ def predict_upload():
 
     response = {'prediction': sign_language_letter}
     return jsonify(response)
+
+# for general sign feature 
+mp_hands = mp.solutions.hands
+
+
+@app.route('/general_sign_predict', methods=['POST'])
+def general_sign_predict():
+    data = request.get_json()
+    image_data = data['image']
+    
+    if 'data:image' in image_data:
+        image_data = re.sub('^data:image/.+;base64,', '', image_data)
+
+    img_bytes = base64.b64decode(image_data)
+    img_np = np.frombuffer(img_bytes, dtype=np.uint8)
+    img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+
+    mp_hands = mp.solutions.hands
+    hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
+    results = hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+
+    if results.multi_hand_landmarks:
+        for hand_landmarks in results.multi_hand_landmarks:
+            mp.solutions.drawing_utils.draw_landmarks(
+                img, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+            # Extract relevant data and perform prediction
+            # Simplified for demonstration purposes
+            gesture = "Detected Sign"
+            break
+    else:
+        gesture = "No Sign Detected"
+
+    response = {'prediction': gesture}
+    return jsonify(response)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -180,3 +180,71 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+
+// for general sign feature
+document.addEventListener('DOMContentLoaded', () => {
+    const generalVideo = document.getElementById('general-video');
+    const generalStartButton = document.getElementById('general-start');
+    const generalStopButton = document.getElementById('general-stop');
+    const generalResultText = document.getElementById('general-result-text');
+
+    const generalSignsSection = document.getElementById('general-signs-section');
+    const chooseGeneralSignsButton = document.getElementById('choose-general-signs');
+
+    let generalStream;
+    let recognitionTimeout;
+    let lastRecognizedSign = '';
+    let lastRecognizedTime = 0;
+
+    // Toggle sections
+    chooseGeneralSignsButton.addEventListener('click', () => {
+        generalSignsSection.classList.remove('hidden');
+    });
+
+    // Camera functions
+    generalStartButton.addEventListener('click', async () => {
+        generalStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        generalVideo.srcObject = generalStream;
+        generalVideo.style.display = 'block';
+
+        recognitionTimeout = setInterval(() => {
+            recognizeSign();
+        }, 1000);
+    });
+
+    generalStopButton.addEventListener('click', () => {
+        generalStream.getTracks().forEach(track => track.stop());
+        generalVideo.style.display = 'none';
+        clearInterval(recognitionTimeout);
+    });
+
+    const recognizeSign = () => {
+        // Capture the frame from the video
+        const canvas = document.createElement('canvas');
+        canvas.width = generalVideo.videoWidth;
+        canvas.height = generalVideo.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(generalVideo, 0, 0, canvas.width, canvas.height);
+
+        const imageDataUrl = canvas.toDataURL('image/png');
+        fetch('/general_sign_predict', {
+            method: 'POST',
+            body: JSON.stringify({ image: imageDataUrl }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const currentTime = Date.now();
+            if (data.prediction !== lastRecognizedSign || currentTime - lastRecognizedTime > 5000) {
+                generalResultText.innerText = data.prediction;
+                lastRecognizedSign = data.prediction;
+                lastRecognizedTime = currentTime;
+                const msg = new SpeechSynthesisUtterance(data.prediction);
+                window.speechSynthesis.speak(msg);
+            }
+        });
+    };
+});
