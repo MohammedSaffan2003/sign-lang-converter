@@ -5,6 +5,9 @@ import tensorflow as tf
 import base64
 import re
 import mediapipe as mp
+from gesture_detection import detect_hand_gesture
+# Load communication dictionary
+from communication_dict import communication_dict
 
 app = Flask(__name__)
 
@@ -74,7 +77,6 @@ def predict_upload():
 # for general sign feature 
 mp_hands = mp.solutions.hands
 
-
 @app.route('/general_sign_predict', methods=['POST'])
 def general_sign_predict():
     data = request.get_json()
@@ -87,24 +89,15 @@ def general_sign_predict():
     img_np = np.frombuffer(img_bytes, dtype=np.uint8)
     img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
 
-    mp_hands = mp.solutions.hands
-    hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
-    results = hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-
-    if results.multi_hand_landmarks:
-        for hand_landmarks in results.multi_hand_landmarks:
-            mp.solutions.drawing_utils.draw_landmarks(
-                img, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-            # Extract relevant data and perform prediction
-            # Simplified for demonstration purposes
-            gesture = "Detected Sign"
-            break
+    gesture, frame = detect_hand_gesture(img)
+    
+    if gesture in communication_dict:
+        response_text = communication_dict[gesture]
     else:
-        gesture = "No Sign Detected"
+        response_text = "Unknown Gesture"
 
-    response = {'prediction': gesture}
+    response = {'prediction': response_text}
     return jsonify(response)
-
 
 
 if __name__ == '__main__':

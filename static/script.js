@@ -181,8 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-// for general sign feature
+// for General Sign Feature
 document.addEventListener('DOMContentLoaded', () => {
     const generalVideo = document.getElementById('general-video');
     const generalStartButton = document.getElementById('general-start');
