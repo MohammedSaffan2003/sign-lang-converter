@@ -20,29 +20,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const wordInput = document.getElementById('word-input');
     const signOutput = document.getElementById('sign-output');
 
-    
+    const sections = document.querySelectorAll('section');
 
-    
-
-    let stream;
+    const showSection = (section) => {
+        sections.forEach(sec => sec.classList.add('hidden'));
+        section.classList.remove('hidden');
+    };
 
     // Toggle sections
     chooseCaptureButton.addEventListener('click', () => {
-        captureSection.classList.remove('hidden');
-        uploadSection.classList.add('hidden');
-        signWordsSection.classList.add('hidden');
+        showSection(captureSection);
     });
 
     chooseUploadButton.addEventListener('click', () => {
-        uploadSection.classList.remove('hidden');
-        captureSection.classList.add('hidden');
-        signWordsSection.classList.add('hidden');
+        showSection(uploadSection);
     });
 
     chooseSignWordsButton.addEventListener('click', () => {
-        signWordsSection.classList.remove('hidden');
-        captureSection.classList.add('hidden');
-        uploadSection.classList.add('hidden');
+        showSection(signWordsSection);
     });
 
     // Camera functions
@@ -116,8 +111,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Handle word input for sign language display
+    wordInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            const word = wordInput.value.trim().toLowerCase();
+            signOutput.innerHTML = '';
+            for (let char of word) {
+                if (char.match(/[a-z0-9]/)) {
+                    const img = document.createElement('img');
+                    img.src = `static/letters/${char}.png`;
+                    img.alt = char;
+                    img.className = 'sign-letter';
+                    signOutput.appendChild(img);
+                } else if (char === ' ') {
+                    const space = document.createElement('div');
+                    space.className = 'sign-space';
+                    signOutput.appendChild(space);
+                }
+            }
+        }
+    });
 
-    
     const inputField = document.getElementById('text-input');
     const textForm = document.getElementById('text-form');
     const wordOutputContainer = document.getElementById('word-output-container');
@@ -158,27 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         inputField.value = '';
     });
-
-
-    wordInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            const word = wordInput.value.trim().toLowerCase();
-            signOutput.innerHTML = '';
-            for (let char of word) {
-                if (char.match(/[a-z0-9]/)) {
-                    const img = document.createElement('img');
-                    img.src = `static/letters/${char}.png`;
-                    img.alt = char;
-                    img.className = 'sign-letter';
-                    signOutput.appendChild(img);
-                } else if (char === ' ') {
-                    const space = document.createElement('div');
-                    space.className = 'sign-space';
-                    signOutput.appendChild(space);
-                }
-            }
-        }
-    });
 });
 
 // for General Sign Feature
@@ -191,14 +183,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const generalSignsSection = document.getElementById('general-signs-section');
     const chooseGeneralSignsButton = document.getElementById('choose-general-signs');
 
+    const sections = document.querySelectorAll('section');
+
     let generalStream;
     let recognitionTimeout;
     let lastRecognizedSign = '';
     let lastRecognizedTime = 0;
 
+    const showSection = (section) => {
+        sections.forEach(sec => sec.classList.add('hidden'));
+        section.classList.remove('hidden');
+    };
+
     // Toggle sections
     chooseGeneralSignsButton.addEventListener('click', () => {
-        generalSignsSection.classList.remove('hidden');
+        showSection(generalSignsSection);
     });
 
     // Camera functions
@@ -213,9 +212,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     generalStopButton.addEventListener('click', () => {
-        generalStream.getTracks().forEach(track => track.stop());
-        generalVideo.style.display = 'none';
-        clearInterval(recognitionTimeout);
+        if (generalStream) {
+            generalStream.getTracks().forEach(track => track.stop());
+            generalVideo.style.display = 'none';
+            clearInterval(recognitionTimeout);
+        }
     });
 
     const recognizeSign = () => {
@@ -224,7 +225,8 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.width = generalVideo.videoWidth;
         canvas.height = generalVideo.videoHeight;
         const context = canvas.getContext('2d');
-        context.drawImage(generalVideo, 0, 0, canvas.width, canvas.height);
+        context.scale(-1, 1);  // Flip horizontally
+        context.drawImage(generalVideo, -canvas.width, 0, canvas.width, canvas.height);
 
         const imageDataUrl = canvas.toDataURL('image/png');
         fetch('/general_sign_predict', {

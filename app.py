@@ -1,3 +1,4 @@
+# app.py
 from flask import Flask, request, jsonify, render_template
 import cv2
 import numpy as np
@@ -99,6 +100,5 @@ def general_sign_predict():
     response = {'prediction': response_text}
     return jsonify(response)
 
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5001)

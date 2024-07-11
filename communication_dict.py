@@ -1,3 +1,4 @@
+# communication_dict.py
 import csv
 
 def load_communication_dict(csv_file):

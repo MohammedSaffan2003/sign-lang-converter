@@ -1,3 +1,4 @@
+# gesture_detection.py
 import cv2
 import mediapipe as mp
 from utils import count_raised_fingers

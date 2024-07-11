@@ -15,8 +15,7 @@
             <button id="choose-capture" class="btn">Predict Through Captured Image</button>
             <button id="choose-upload" class="btn">Predict Through Uploaded Image</button>
             <button id="choose-sign-words" class="btn">See Sign Of Words</button>
-            <button id="choose-general-signs" class="btn">General Signs</button> <!-- General Sign Button -->
-
+            <button id="choose-general-signs" class="btn">General Signs</button>
         </div>
         <section id="capture-section" class="hidden">
             <div id="camera-container">
@@ -52,7 +51,6 @@
                 <div id="sign-output"></div>
             </div>
         </section>
-
         <section id="word-section" class="hidden">
             <form id="text-form">
                 <input type="text" id="text-input" placeholder="Type a word or sentence">
@@ -60,20 +58,19 @@
             </form>
             <div id="word-output-container"></div>
         </section>    
-<!-- for general signs feature -->
-<section id="general-signs-section" class="hidden">
-    <div id="general-camera-container">
-        <video id="general-video" autoplay playsinline></video>
-    </div>
-    <div class="button-container">
-        <button id="general-start" class="btn">Start Camera</button>
-        <button id="general-stop" class="btn">Stop Camera</button>
-    </div>
-    <div id="general-result-container">
-        <h2>Recognition Result</h2>
-        <div id="general-result-text"></div>
-    </div>
-</section>
+        <section id="general-signs-section" class="hidden">
+            <div id="general-camera-container">
+                <video id="general-video" autoplay playsinline></video>
+            </div>
+            <div class="button-container">
+                <button id="general-start" class="btn">Start Camera</button>
+                <button id="general-stop" class="btn">Stop Camera</button>
+            </div>
+            <div id="general-result-container">
+                <h2>Recognition Result</h2>
+                <div id="general-result-text"></div>
+            </div>
+        </section>
     </main>
     <footer>
         <p>&copy; 2024 Sign Language Converter. All rights reserved.</p>
