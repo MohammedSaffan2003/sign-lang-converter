@@ -191,14 +191,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const generalSignsSection = document.getElementById('general-signs-section');
     const chooseGeneralSignsButton = document.getElementById('choose-general-signs');
 
+    const sections = document.querySelectorAll('section');
+
     let generalStream;
     let recognitionTimeout;
     let lastRecognizedSign = '';
     let lastRecognizedTime = 0;
 
+    const showSection = (section) => {
+        sections.forEach(sec => sec.classList.add('hidden'));
+        section.classList.remove('hidden');
+    };
+
     // Toggle sections
     chooseGeneralSignsButton.addEventListener('click', () => {
-        generalSignsSection.classList.remove('hidden');
+        showSection(generalSignsSection);
     });
 
     // Camera functions
@@ -224,7 +231,8 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.width = generalVideo.videoWidth;
         canvas.height = generalVideo.videoHeight;
         const context = canvas.getContext('2d');
-        context.drawImage(generalVideo, 0, 0, canvas.width, canvas.height);
+        context.scale(-1, 1);  // Flip horizontally
+        context.drawImage(generalVideo, -canvas.width, 0, canvas.width, canvas.height);
 
         const imageDataUrl = canvas.toDataURL('image/png');
         fetch('/general_sign_predict', {

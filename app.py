@@ -1,3 +1,4 @@
+# app.py
 from flask import Flask, request, jsonify, render_template
 import cv2
 import numpy as np
@@ -5,7 +6,7 @@ import tensorflow as tf
 import base64
 import re
 import mediapipe as mp
-from gesture_detection import detect_hand_gesture
+from gesture_detection import detect_gestures, detect_hand_gesture
 # Load communication dictionary
 from communication_dict import communication_dict
 
@@ -88,17 +89,44 @@ def general_sign_predict():
     img_bytes = base64.b64decode(image_data)
     img_np = np.frombuffer(img_bytes, dtype=np.uint8)
     img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
-
-    gesture, frame = detect_hand_gesture(img)
     
-    if gesture in communication_dict:
-        response_text = communication_dict[gesture]
-    else:
-        response_text = "Unknown Gesture"
+    gesture, annotated_frame = detect_gestures(img)
 
-    response = {'prediction': response_text}
+    _, buffer = cv2.imencode('.jpg', annotated_frame)
+    encoded_image = base64.b64encode(buffer).decode()
+
+    response = {
+        'prediction': gesture,
+        'annotated_image': f'data:image/jpeg;base64,{encoded_image}'
+    }
+
     return jsonify(response)
 
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
+
+# @app.route('/general_sign_predict', methods=['POST'])
+# def general_sign_predict():
+#     data = request.get_json()
+#     image_data = data['image']
+    
+#     if 'data:image' in image_data:
+#         image_data = re.sub('^data:image/.+;base64,', '', image_data)
+
+#     img_bytes = base64.b64decode(image_data)
+#     img_np = np.frombuffer(img_bytes, dtype=np.uint8)
+#     img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+
+#     gesture, frame = detect_hand_gesture(img)
+    
+#     if gesture in communication_dict:
+#         response_text = communication_dict[gesture]
+#     else:
+#         response_text = "Unknown Gesture"
+
+#     response = {'prediction': response_text}
+#     return jsonify(response)
+
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
