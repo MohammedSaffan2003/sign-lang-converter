@@ -147,39 +147,7 @@ def text_to_image():
             )
         else:
             return jsonify({'error': 'Image not found'}), 404
-# def fetch_image_from_web(phrase):
-#     search_url = "https://api.example.com/search"
-#     params = {"query": phrase}
-#     response = requests.get(search_url, params=params)
-    
-#     if response.status_code == 200:
-#         image_url = response.json()['image_url']
-#         image_response = requests.get(image_url)
-#         return Image.open(BytesIO(image_response.content))
-#     else:
-#         return None
 
-# @app.route('/text_to_image', methods=['POST'])
-# def text_to_image():
-#     data = request.get_json()
-#     phrase = data.get('phrase')
-    
-#     if not phrase:
-#         return jsonify({'error': 'Phrase is required'}), 400
-    
-#     # Check if the image is stored locally
-#     image_path = f"stored_images/{phrase}.jpg"
-    
-#     if os.path.exists(image_path):
-#         return send_file(image_path, mimetype='image/jpeg')
-#     else:
-#         # Fetch image from the web
-#         image = fetch_image_from_web(phrase)
-#         if image:
-#             image.save(image_path)
-#             return send_file(image_path, mimetype='image/jpeg')
-#         else:
-#             return jsonify({'error': 'Image not found'}), 404
 
 if __name__ == '__main__':
     app.run(port=5000)
