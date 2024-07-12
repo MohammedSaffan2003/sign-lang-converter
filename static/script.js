@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const captureSection = document.getElementById('capture-section');
     const uploadSection = document.getElementById('upload-section');
     const signWordsSection = document.getElementById('sign-words-section');
-    const chooseCaptureButton = document.getElementById('choose-capture');
+    // const chooseCaptureButton = document.getElementById('choose-capture'); //for ss purpose
     const chooseUploadButton = document.getElementById('choose-upload');
     const chooseSignWordsButton = document.getElementById('choose-sign-words');
     const wordInput = document.getElementById('word-input');
@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Toggle sections
-    chooseCaptureButton.addEventListener('click', () => {
-        showSection(captureSection);
-    });
+    // chooseCaptureButton.addEventListener('click', () => {
+    //     showSection(captureSection);
+    // }); //for ss purpose
 
     chooseUploadButton.addEventListener('click', () => {
         showSection(uploadSection);
