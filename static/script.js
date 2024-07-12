@@ -249,3 +249,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 });
+
+
+// for text-image feature 
+document.addEventListener('DOMContentLoaded', () => {
+    const chooseTextToImageButton = document.getElementById('choose-text-to-image');
+    const textToImageSection = document.getElementById('text-to-image-section');
+    const phraseInput = document.getElementById('phrase-input');
+    const getImageButton = document.getElementById('get-image');
+    const resultImage = document.getElementById('result-image');
+    const sections = document.querySelectorAll('section');
+
+    const showSection = (section) => {
+        sections.forEach(sec => sec.classList.add('hidden'));
+        section.classList.remove('hidden');
+    };
+
+    chooseTextToImageButton.addEventListener('click', () => {
+        showSection(textToImageSection);
+    });
+
+    getImageButton.addEventListener('click', () => {
+        const phrase = phraseInput.value;
+        fetch('/text_to_image', {
+            method: 'POST',
+            body: JSON.stringify({ phrase: phrase }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            } else {
+                throw new Error('Image not found');
+            }
+        })
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            resultImage.src = url;
+        })
+        .catch(error => {
+            resultImage.src = '';
+            alert(error.message);
+        });
+    });
+});

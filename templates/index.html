@@ -1,80 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign Language Converter</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
     <header>
-        <h1>Sign Language Converter</h1>
+      <h1>Sign Language Converter</h1>
     </header>
     <main>
-        <div class="choice-container">
-            <button id="choose-capture" class="btn">Predict Through Captured Image</button>
-            <button id="choose-upload" class="btn">Predict Through Uploaded Image</button>
-            <button id="choose-sign-words" class="btn">See Sign Of Words</button>
-            <button id="choose-general-signs" class="btn">General Signs</button>
+      <div class="choice-container">
+        <button id="choose-capture" class="btn">
+          Predict Through Captured Image
+        </button>
+        <button id="choose-upload" class="btn">
+          Predict Through Uploaded Image
+        </button>
+        <button id="choose-sign-words" class="btn">See Sign Of Words</button>
+        <button id="choose-general-signs" class="btn">General Signs</button>
+        <button id="choose-text-to-image" class="btn">Text to Image</button>
+      </div>
+      <section id="capture-section" class="hidden">
+        <div id="camera-container">
+          <video id="video" autoplay playsinline></video>
         </div>
-        <section id="capture-section" class="hidden">
-            <div id="camera-container">
-                <video id="video" autoplay playsinline></video>
-            </div>
-            <div class="button-container">
-                <button id="start" class="btn">Start Camera</button>
-                <button id="capture" class="btn">Capture</button>
-                <button id="stop" class="btn">Stop Camera</button>
-            </div>
-            <div id="result-container">
-                <h2>Recognition Result</h2>
-                <div id="result-text"></div>
-                <button id="speak" class="btn">Speak</button>
-            </div>
-        </section>
-        <section id="upload-section" class="hidden">
-            <input type="file" id="imageUpload" accept="image/*" />
-            <button id="upload" class="btn">Upload</button>
-            <div id="uploaded-image-container">
-                <img id="uploaded-image" alt="Uploaded Preview">
-            </div>
-            <div id="upload-result-container">
-                <h2>Recognition Result</h2>
-                <div id="upload-result-text"></div>
-                <button id="upload-speak" class="btn">Speak</button>
-            </div>
-        </section>
-        <section id="sign-words-section" class="hidden">
-            <input type="text" id="word-input" placeholder="Type a word or phrase and press Enter">
-            <div id="sign-output-container">
-                <h2>Sign Language Output</h2>
-                <div id="sign-output"></div>
-            </div>
-        </section>
-        <section id="word-section" class="hidden">
-            <form id="text-form">
-                <input type="text" id="text-input" placeholder="Type a word or sentence">
-                <button type="submit" class="btn">Convert to Sign</button>
-            </form>
-            <div id="word-output-container"></div>
-        </section>    
-        <section id="general-signs-section" class="hidden">
-            <div id="general-camera-container">
-                <video id="general-video" autoplay playsinline></video>
-            </div>
-            <div class="button-container">
-                <button id="general-start" class="btn">Start Camera</button>
-                <button id="general-stop" class="btn">Stop Camera</button>
-            </div>
-            <div id="general-result-container">
-                <h2>Recognition Result</h2>
-                <div id="general-result-text"></div>
-            </div>
-        </section>
+        <div class="button-container">
+          <button id="start" class="btn">Start Camera</button>
+          <button id="capture" class="btn">Capture</button>
+          <button id="stop" class="btn">Stop Camera</button>
+        </div>
+        <div id="result-container">
+          <h2>Recognition Result</h2>
+          <div id="result-text"></div>
+          <button id="speak" class="btn">Speak</button>
+        </div>
+      </section>
+      <section id="upload-section" class="hidden">
+        <input type="file" id="imageUpload" accept="image/*" />
+        <button id="upload" class="btn">Upload</button>
+        <div id="uploaded-image-container">
+          <img id="uploaded-image" alt="Uploaded Preview" />
+        </div>
+        <div id="upload-result-container">
+          <h2>Recognition Result</h2>
+          <div id="upload-result-text"></div>
+          <button id="upload-speak" class="btn">Speak</button>
+        </div>
+      </section>
+      <section id="sign-words-section" class="hidden">
+        <input
+          type="text"
+          id="word-input"
+          placeholder="Type a word or phrase and press Enter"
+        />
+        <div id="sign-output-container">
+          <h2>Sign Language Output</h2>
+          <div id="sign-output"></div>
+        </div>
+      </section>
+      <section id="word-section" class="hidden">
+        <form id="text-form">
+          <input
+            type="text"
+            id="text-input"
+            placeholder="Type a word or sentence"
+          />
+          <button type="submit" class="btn">Convert to Sign</button>
+        </form>
+        <div id="word-output-container"></div>
+      </section>
+      <section id="general-signs-section" class="hidden">
+        <div id="general-camera-container">
+          <video id="general-video" autoplay playsinline></video>
+        </div>
+        <div class="button-container">
+          <button id="general-start" class="btn">Start Camera</button>
+          <button id="general-stop" class="btn">Stop Camera</button>
+        </div>
+        <div id="general-result-container">
+          <h2>Recognition Result</h2>
+          <div id="general-result-text"></div>
+        </div>
+      </section>
+      <!-- for text-image    -->
+      <section id="text-to-image-section" class="hidden">
+        <h2>Text to Image</h2>
+        <input type="text" id="phrase-input" placeholder="Enter a phrase" />
+        <button id="get-image">Get Image</button>
+        <div id="image-result">
+          <img id="result-image" src="" alt="Result Image" />
+        </div>
+      </section>
     </main>
     <footer>
-        <p>&copy; 2024 Sign Language Converter. All rights reserved.</p>
+      <p>&copy; 2024 Sign Language Converter. All rights reserved.</p>
     </footer>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
+  </body>
 </html>

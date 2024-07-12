@@ -212,3 +212,21 @@ video {
     -ms-transform: scaleX(-1);
     transform : scaleX(-1);
   }
+
+  /* for Text-image feature */
+  .hidden {
+    display: none;
+}
+.btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+#text-to-image-section {
+    margin-top: 20px;
+}
+#image-result {
+    margin-top: 20px;
+}

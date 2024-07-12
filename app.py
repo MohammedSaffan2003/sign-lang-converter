@@ -1,11 +1,18 @@
 # app.py
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template,send_file
 import cv2
 import numpy as np
 import tensorflow as tf
 import base64
 import re
 import mediapipe as mp
+import os
+import io
+import os
+from PIL import Image
+import requests
+from io import BytesIO
+from bs4 import BeautifulSoup
 from gesture_detection import detect_hand_gesture
 # Load communication dictionary
 from communication_dict import communication_dict
@@ -99,6 +106,80 @@ def general_sign_predict():
 
     response = {'prediction': response_text}
     return jsonify(response)
+
+# for text-image feature
+def fetch_image_from_web(phrase):
+    query = phrase.replace("_", "+")
+    url = f"https://www.bing.com/images/search?q={query}&qft=+filterui:photo-photo"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    image_results = soup.find_all('img', class_='mimg')
+
+    if image_results:
+        image_url = image_results[0]['src']
+        image_response = requests.get(image_url)
+        if image_response.status_code == 200:
+            return image_response.content
+    return None
+
+@app.route('/text_to_image', methods=['POST'])
+def text_to_image():
+    data = request.get_json()
+    phrase = data['phrase'].strip().lower().replace(" ", "_")  # Normalize the phrase
+
+    # Define the directory where your stored images are located
+    images_dir = 'stored_images'
+    image_path = os.path.join(images_dir, f"{phrase}.png")
+
+    if os.path.exists(image_path):
+        return send_file(image_path, mimetype='image/png')
+    else:
+        web_image = fetch_image_from_web(phrase)
+        if web_image:
+            return send_file(
+                io.BytesIO(web_image),
+                mimetype='image/png',
+                as_attachment=True,
+                attachment_filename=f"{phrase}.png"
+            )
+        else:
+            return jsonify({'error': 'Image not found'}), 404
+# def fetch_image_from_web(phrase):
+#     search_url = "https://api.example.com/search"
+#     params = {"query": phrase}
+#     response = requests.get(search_url, params=params)
+    
+#     if response.status_code == 200:
+#         image_url = response.json()['image_url']
+#         image_response = requests.get(image_url)
+#         return Image.open(BytesIO(image_response.content))
+#     else:
+#         return None
+
+# @app.route('/text_to_image', methods=['POST'])
+# def text_to_image():
+#     data = request.get_json()
+#     phrase = data.get('phrase')
+    
+#     if not phrase:
+#         return jsonify({'error': 'Phrase is required'}), 400
+    
+#     # Check if the image is stored locally
+#     image_path = f"stored_images/{phrase}.jpg"
+    
+#     if os.path.exists(image_path):
+#         return send_file(image_path, mimetype='image/jpeg')
+#     else:
+#         # Fetch image from the web
+#         image = fetch_image_from_web(phrase)
+#         if image:
+#             image.save(image_path)
+#             return send_file(image_path, mimetype='image/jpeg')
+#         else:
+#             return jsonify({'error': 'Image not found'}), 404
 
 if __name__ == '__main__':
     app.run(port=5000)
