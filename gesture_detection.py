@@ -18,7 +18,11 @@ def detect_hand_gesture(frame):
         
         for hand_landmarks in hand_landmarks_list:
             mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS,
-                                   landmark_drawing_spec=mp_draw.DrawingSpec(color=(255, 0, 0), thickness=2, circle_radius=4))
+                                   landmark_drawing_spec=mp_draw.DrawingSpec(color=(255, 0, 0), thickness=20, circle_radius=40))
         hand_gesture = count_raised_fingers(hand_landmarks_list)
+        # for hand_landmarks in hand_landmarks_list:
+        #     mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS,
+        #                            landmark_drawing_spec=mp_draw.DrawingSpec(color=(255, 0, 0), thickness=2, circle_radius=4))
+        # hand_gesture = count_raised_fingers(hand_landmarks_list)
 
     return hand_gesture, frame
